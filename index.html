@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hy01er's Tech Blog</title>
+<title>博客</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
@@ -179,7 +179,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 
 <!-- HEADER -->
 <header class="header">
-  <a class="header-logo" id="homeLink">✦ Hy01er's Blog</a>
+  <a class="header-logo" id="homeLink">✦ 博客</a>
   <nav class="header-nav" id="headerNav"></nav>
   <div class="header-actions">
     <input type="text" class="search-input-sm" id="searchInput" placeholder="搜索...">
@@ -248,7 +248,7 @@ try{marked.use({breaks:true,gfm:true});}catch(e){marked.setOptions({breaks:true,
 function renderMarkdown(md){let html=marked.parse(md||"");try{const temp=document.createElement("div");temp.innerHTML=html;temp.querySelectorAll("pre code").forEach(block=>{try{const lang=block.className.replace("language-","")||"";if(lang&&hljs.getLanguage(lang)){const r=hljs.highlight(block.textContent,{language:lang});block.innerHTML=r.value;block.className+=" hljs";}else{hljs.highlightElement(block);}}catch(e){}});html=temp.innerHTML;}catch(e){}return html;}
 
 // ===== BLOG DATA =====
-let blogData={settings:{blogName:"Hy01er's Tech Blog",blogDesc:"嵌入式系统 · 硬件 · 蓝牙/WiFi · RTOS",adminPasswordHash:"",passwordSalt:"",adminSetup:true},columns:[{id:"mcu",name:"MCU & ARM",icon:"💻"},{id:"hw",name:"硬件设计",icon:"🔧"},{id:"ble",name:"蓝牙 BLE",icon:"📶"},{id:"wifi",name:"WiFi & 网络",icon:"🌐"},{id:"rtos",name:"RTOS",icon:"⏱️"},{id:"tools",name:"工具链",icon:"🛠️"}],posts:[]};
+let blogData={settings:{blogName:"博客",blogDesc:"嵌入式系统 · 硬件 · 蓝牙/WiFi · RTOS",adminPasswordHash:"",passwordSalt:"",adminSetup:true},columns:[{id:"mcu",name:"MCU & ARM",icon:"💻"},{id:"hw",name:"硬件设计",icon:"🔧"},{id:"ble",name:"蓝牙 BLE",icon:"📶"},{id:"wifi",name:"WiFi & 网络",icon:"🌐"},{id:"rtos",name:"RTOS",icon:"⏱️"},{id:"tools",name:"工具链",icon:"🛠️"}],posts:[]};
 let isAdmin=false,editingPostId=null;
 
 function loadBlogData(){
@@ -351,7 +351,7 @@ function renderPost(slug){
   if(!post){document.getElementById("mainArea").innerHTML=`<div class="empty-state"><span class="icon">🌌</span><p>文章不存在</p></div>`;return;}
   const col=getColumn(post.column);const body=renderMarkdown(post.content);
   const toc=generateTOC(body);
-  document.title=`${post.title} - Hy01er's Blog`;
+  document.title=`${post.title} - 博客`;
   document.getElementById("mainArea").innerHTML=`
     <article class="post-article">
       <div class="post-header">
