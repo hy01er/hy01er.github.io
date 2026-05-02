@@ -106,40 +106,48 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 .empty-state .icon{font-size:3.5rem;display:block;margin-bottom:1rem;animation:floatIcon 3s ease-in-out infinite}
 @keyframes floatIcon{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
 
-/* ===ADMIN DRAWER=== */
-.admin-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none}
-.admin-overlay.show{display:block}
-.admin-drawer{position:fixed;top:0;right:0;width:480px;max-width:90vw;height:100vh;z-index:201;background:var(--surface);border-left:1px solid var(--border);box-shadow:-10px 0 60px rgba(0,0,0,.5);transform:translateX(100%);transition:transform var(--tr);display:flex;flex-direction:column;overflow-y:auto}
-.admin-drawer.open{transform:translateX(0)}
-.admin-drawer-header{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.2rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:2}
-.admin-drawer-title{font-size:.9rem;font-weight:700;letter-spacing:1.5px;color:var(--accent2)}
-.admin-drawer-close{width:32px;height:32px;border-radius:50%;background:transparent;border:1px solid var(--border);color:var(--text2);cursor:pointer;font-size:1rem;transition:all var(--tr);display:flex;align-items:center;justify-content:center}
-.admin-drawer-close:hover{border-color:var(--red);color:var(--red)}
-.admin-drawer-body{padding:1.2rem;flex:1;overflow-y:auto}
+/* ===ADMIN DASHBOARD=== */
 .admin-section{margin-bottom:1.2rem}
 .admin-label{font-size:.7rem;font-weight:700;color:var(--text3);letter-spacing:2px;margin-bottom:.4rem;text-transform:uppercase}
 .admin-input{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:8px;padding:.6rem .8rem;color:#fff;font-size:.85rem;font-family:var(--font);outline:none;transition:border var(--tr)}
 .admin-input:focus{border-color:var(--accent2)}
-.admin-select{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:8px;padding:.6rem .8rem;color:#fff;font-size:.85rem;font-family:var(--font);outline:none;cursor:pointer}
+.admin-select{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:8px;padding:.55rem .7rem;color:#fff;font-size:.85rem;font-family:var(--font);outline:none;cursor:pointer}
 .admin-select option{background:var(--surface);color:#fff}
-.admin-textarea{width:100%;min-height:300px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:8px;padding:.8rem;color:var(--text);font-size:.88rem;font-family:"JetBrains Mono","Fira Code",monospace;line-height:1.7;outline:none;resize:vertical;transition:border var(--tr)}
-.admin-textarea:focus{border-color:var(--accent)}
-.admin-preview{min-height:200px;background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:8px;padding:1rem;line-height:1.85;font-size:.9rem;color:var(--text)}
-.admin-preview h1,.admin-preview h2,.admin-preview h3{color:#fff;margin:1rem 0 .5rem}
-.admin-preview h1{font-size:1.4rem}
-.admin-preview h2{font-size:1.15rem}
-.admin-preview pre{background:#1a1a2e;border-radius:6px;padding:.8rem;overflow-x:auto}
-.admin-preview code{background:rgba(168,85,247,.15);padding:.1rem .4rem;border-radius:3px;color:var(--accent2)}
-.admin-preview blockquote{border-left:3px solid var(--accent2);padding-left:.8rem;color:var(--text2)}
-.md-tab-bar{display:flex;gap:.3rem;margin-bottom:.5rem}
-.md-tab{padding:.25rem .7rem;border-radius:6px;font-size:.72rem;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--text2);transition:all var(--tr);font-family:var(--font)}
-.md-tab.active{background:rgba(168,85,247,.2);color:var(--accent2)}
-.admin-post-list{display:flex;flex-direction:column;gap:.3rem;max-height:300px;overflow-y:auto}
-.admin-post-item{display:flex;justify-content:space-between;align-items:center;padding:.5rem .7rem;border-radius:8px;background:rgba(0,0,0,.2);cursor:pointer;transition:all var(--tr);font-size:.78rem}
-.admin-post-item:hover{background:rgba(0,212,255,.06)}
+.admin-post-list{display:flex;flex-direction:column;gap:.3rem;max-height:400px;overflow-y:auto}
+.admin-post-item{display:flex;justify-content:space-between;align-items:center;padding:.55rem .8rem;border-radius:8px;background:rgba(0,0,0,.2);cursor:pointer;transition:all var(--tr);font-size:.82rem}
+.admin-post-item:hover{background:rgba(0,212,255,.08)}
 .admin-post-item .title{color:var(--text);flex:1}
 .admin-post-item .meta{font-size:.65rem;color:var(--text3);white-space:nowrap;margin-left:.5rem}
 .admin-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem}
+
+/* ===FULL-PAGE EDITOR=== */
+.admin-editor{display:flex;flex-direction:column;gap:1rem;animation:fadeUp .3s ease-out}
+.admin-editor-top{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap}
+.admin-editor-top .admin-input{flex:1;min-width:200px;font-size:1.1rem;font-weight:700;background:transparent;border:none;border-bottom:2px solid var(--border);border-radius:0;padding:.4rem 0}
+.admin-editor-top .admin-input:focus{border-bottom-color:var(--accent)}
+.editor-split{display:flex;gap:1rem;min-height:60vh}
+.editor-split .split-left,.editor-split .split-right{flex:1;display:flex;flex-direction:column;min-width:0}
+.editor-split .split-left{border-right:1px solid var(--border);padding-right:1rem}
+.editor-split .split-right{padding-left:1rem;overflow-y:auto}
+.editor-textarea{width:100%;height:100%;min-height:60vh;background:transparent;border:none;color:var(--text);font-size:.92rem;font-family:"JetBrains Mono","Fira Code",monospace;line-height:1.8;outline:none;resize:none}
+.editor-preview{min-height:60vh;color:var(--text);line-height:1.85;font-size:.92rem}
+.editor-preview h1,.editor-preview h2,.editor-preview h3{color:#fff;margin:1rem 0 .5rem}
+.editor-preview h1{font-size:1.5rem;border-bottom:2px solid var(--border);padding-bottom:.3rem}
+.editor-preview h2{font-size:1.2rem}
+.editor-preview h3{font-size:1rem;color:var(--accent2)}
+.editor-preview pre{background:#1a1a2e;border:1px solid var(--border);border-radius:6px;padding:1rem;overflow-x:auto}
+.editor-preview code{background:rgba(168,85,247,.15);padding:.1rem .4rem;border-radius:3px;color:var(--accent2)}
+.editor-preview blockquote{border-left:3px solid var(--accent2);padding-left:.8rem;color:var(--text2)}
+.editor-preview ul,.editor-preview ol{padding-left:1.5rem}
+.editor-preview a{color:var(--accent)}
+.editor-preview img{max-width:100%;border-radius:8px}
+.editor-preview table{width:100%;border-collapse:collapse;margin:.6rem 0}
+.editor-preview th,.editor-preview td{border:1px solid var(--border);padding:.4rem .6rem;text-align:left}
+.editor-preview th{background:rgba(0,212,255,.08);color:#fff}
+.editor-preview hr{border:none;border-top:1px solid var(--border);margin:1rem 0}
+.md-tab-bar{display:flex;gap:.3rem;margin-bottom:.5rem}
+.md-tab{padding:.25rem .7rem;border-radius:6px;font-size:.72rem;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--text2);transition:all var(--tr);font-family:var(--font)}
+.md-tab.active{background:rgba(168,85,247,.2);color:var(--accent2)}
 
 /* ===PASSWORD MODAL=== */
 .pw-modal-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center}
@@ -169,7 +177,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
   .header-nav{display:none}
   .search-input-sm{width:100px}.search-input-sm:focus{width:130px}
   .post-header h1{font-size:1.4rem}
-  .admin-drawer{width:100vw;max-width:100vw}
+  .editor-split{flex-direction:column;min-height:auto}.editor-split .split-left{border-right:none;padding-right:0;border-bottom:1px solid var(--border);padding-bottom:.8rem}.editor-split .split-right{padding-left:0;padding-top:.8rem}.editor-textarea{min-height:40vh}.editor-preview{min-height:auto}
 }
 </style>
 </head>
@@ -188,17 +196,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 </header>
 
 <div class="toast-container" id="toastContainer"></div>
-<div class="admin-overlay" id="adminOverlay"></div>
-
-<!-- ADMIN DRAWER -->
-<div class="admin-drawer" id="adminDrawer">
-  <div class="admin-drawer-header">
-    <span class="admin-drawer-title">博客管理</span>
-    <button class="admin-drawer-close" id="adminCloseBtn">✕</button>
-  </div>
-  <div class="admin-drawer-body" id="adminBody"></div>
-</div>
-
 <!-- APP CONTAINER -->
 <div class="app-container" id="appContainer">
   <aside class="sidebar" id="sidebar">
@@ -315,6 +312,7 @@ function renderSidebar(){
 
 // ===== PUBLIC VIEWS =====
 function renderView(){
+  if(isAdmin)return;
   updateActiveNav();renderSidebar();
   const r=getRoute();
   switch(r.action){
@@ -325,7 +323,6 @@ function renderView(){
     case"search":renderSearch();break;
     default:renderHome();
   }
-  if(isAdmin&&document.getElementById("adminDrawer").classList.contains("open"))renderAdminPanel();
 }
 
 function renderHome(){
@@ -429,7 +426,7 @@ function generateTOC(html){
 }
 
 // ===== ADMIN =====
-function showAdminPanel(){if(isAdmin){openDrawer();return;}showPasswordModal();}
+function showAdminPanel(){if(isAdmin){openAdmin();return;}showPasswordModal();}
 function showPasswordModal(){
   const m=document.getElementById("pwModal");m.classList.add("show");
   document.getElementById("pwInput").value="";document.getElementById("pwErr").textContent="";
@@ -438,90 +435,94 @@ function showPasswordModal(){
   document.getElementById("pwInput").focus();
 }
 function hidePasswordModal(){document.getElementById("pwModal").classList.remove("show");}
+function updateAdminUI(){
+  const btn=document.getElementById("adminBtn");
+  if(isAdmin){btn.textContent="退出";btn.className="btn btn-danger btn-sm";}
+  else{btn.textContent="管理";btn.className="btn btn-ghost btn-sm";}
+}
 
 document.getElementById("pwSubmitBtn").addEventListener("click",async()=>{
   const pw=document.getElementById("pwInput").value;
   if(!pw){document.getElementById("pwErr").textContent="请输入密码";return;}
   const ok=await checkAdminPassword(pw);
   if(!ok){document.getElementById("pwErr").textContent="密码错误";return;}
-  isAdmin=true;hidePasswordModal();
+  isAdmin=true;hidePasswordModal();updateAdminUI();
   if(blogData.settings.adminSetup){saveBlogData();toast("管理密码已设置","success");}
   else{toast("管理模式","info");}
-  openDrawer();
+  openAdmin();
 });
 document.getElementById("pwInput").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("pwSubmitBtn").click();});
 document.getElementById("pwModal").addEventListener("click",function(e){if(e.target===this)hidePasswordModal();});
+document.getElementById("adminBtn").addEventListener("click",()=>{if(isAdmin){logoutAdmin();}else{showAdminPanel();}});
 
-function openDrawer(){
-  document.getElementById("adminDrawer").classList.add("open");
-  document.getElementById("adminOverlay").classList.add("show");
-  renderAdminPanel();
+function openAdmin(){
+  document.getElementById("sidebar").style.display="none";
+  document.getElementById("mainArea").style.maxWidth="100%";
+  editingPostId=null;
+  renderAdminDashboard();
 }
-function closeDrawer(){
-  document.getElementById("adminDrawer").classList.remove("open");
-  document.getElementById("adminOverlay").classList.remove("show");
-}
-document.getElementById("adminCloseBtn").addEventListener("click",closeDrawer);
-document.getElementById("adminOverlay").addEventListener("click",closeDrawer);
-document.getElementById("adminBtn").addEventListener("click",showAdminPanel);
+function logoutAdmin(){isAdmin=false;editingPostId=null;updateAdminUI();document.getElementById("sidebar").style.display="";document.getElementById("mainArea").style.maxWidth="";renderView();toast("已退出管理","info");}
 
-function renderAdminPanel(){
-  const body=document.getElementById("adminBody");
-  if(editingPostId){
-    const post=editingPostId==="new"?null:blogData.posts.find(p=>p.id===editingPostId);
-    renderAdminEditor(post);
-  }else{
-    body.innerHTML=`
-      <div class="admin-section">
-        <div class="admin-actions">
-          <button class="btn btn-primary btn-sm" id="adminNewPostBtn">✚ 新建文章</button>
-          <button class="btn btn-ghost btn-sm" id="adminPublishBtn">📤 发布到 GitHub</button>
-          <button class="btn btn-danger btn-sm" id="adminLogoutBtn">退出</button>
-        </div>
+function renderAdminDashboard(){
+  document.getElementById("mainArea").innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:.8rem">
+      <h2 style="font-size:1.4rem;font-weight:700;color:#fff;letter-spacing:1px">管理面板</h2>
+      <div class="admin-actions" style="margin-top:0">
+        <button class="btn btn-primary btn-sm" id="adminNewPostBtn">✚ 新建文章</button>
+        <button class="btn btn-ghost btn-sm" id="adminPublishBtn">📤 发布到 GitHub</button>
       </div>
-      <div class="admin-section">
-        <div class="admin-label">所有文章 (${blogData.posts.length})</div>
-        <div class="admin-post-list">${blogData.posts.length?blogData.posts.map(p=>`<div class="admin-post-item" data-id="${p.id}"><span class="title">${escapeHtml(p.title)}</span><span class="meta">${formatDateShort(p.publishedAt)}</span></div>`).join(""):'<div style="color:var(--text3);font-size:.75rem;padding:.5rem">暂无文章</div>'}</div>
-      </div>
-      <div class="admin-section">
-        <div class="admin-label">专栏管理</div>
-        <div id="adminColList">${blogData.columns.map(c=>`<div style="display:flex;gap:.4rem;align-items:center;margin-bottom:.3rem"><input type="text" class="admin-input" value="${escapeHtml(c.icon)} ${escapeHtml(c.name)}" data-col-id="${c.id}" style="flex:1"><button class="btn btn-danger btn-sm" data-col-del="${c.id}">✕</button></div>`).join("")}</div>
-        <div style="display:flex;gap:.4rem;margin-top:.4rem"><input type="text" class="admin-input" id="newColName" placeholder="新专栏名称" style="flex:1"><input type="text" class="admin-input" id="newColIcon" placeholder="图标" style="width:60px" maxlength="4" value="📌"><button class="btn btn-ghost btn-sm" id="addColBtn">+</button></div>
-      </div>`;
-    body.querySelectorAll(".admin-post-item").forEach(el=>{el.addEventListener("click",function(){editingPostId=this.dataset.id;renderAdminPanel();});});
-    document.getElementById("adminNewPostBtn").addEventListener("click",()=>{editingPostId="new";renderAdminPanel();});
-    document.getElementById("adminPublishBtn").addEventListener("click",publishBlog);
-    document.getElementById("adminLogoutBtn").addEventListener("click",()=>{isAdmin=false;editingPostId=null;closeDrawer();toast("已退出管理","info");});
-    document.getElementById("addColBtn").addEventListener("click",()=>{const n=document.getElementById("newColName").value.trim();const ic=document.getElementById("newColIcon").value.trim()||"📌";if(n){blogData.columns.push({id:slugify(n),name:n,icon:ic});saveBlogData();renderAdminPanel();renderView();}});
-    body.querySelectorAll("[data-col-del]").forEach(b=>{b.addEventListener("click",function(){const id=this.dataset.colDel;blogData.columns=blogData.columns.filter(c=>c.id!==id);saveBlogData();renderAdminPanel();renderView();});});
-    body.querySelectorAll("[data-col-id]").forEach(inp=>{inp.addEventListener("change",function(){const id=this.dataset.colId;const col=blogData.columns.find(c=>c.id===id);if(col){const m=this.value.match(/^(\S+)\s+(.+)/);if(m){col.icon=m[1];col.name=m[2];}else{col.name=this.value;}saveBlogData();renderView();}});});
-  }
+    </div>
+    <div class="admin-section">
+      <div class="admin-label">所有文章 (${blogData.posts.length})</div>
+      <div class="admin-post-list">${blogData.posts.length?blogData.posts.map(p=>`<div class="admin-post-item" data-id="${p.id}"><span class="title">${escapeHtml(p.title)}</span><span class="meta">${formatDateShort(p.publishedAt)}</span></div>`).join(""):'<div style="color:var(--text3);font-size:.82rem;padding:.5rem">暂无文章，点击上方按钮开始写作</div>'}</div>
+    </div>
+    <div class="admin-section">
+      <div class="admin-label">专栏管理</div>
+      <div id="adminColList">${blogData.columns.map(c=>`<div style="display:flex;gap:.4rem;align-items:center;margin-bottom:.3rem"><input type="text" class="admin-input" value="${escapeHtml(c.icon)} ${escapeHtml(c.name)}" data-col-id="${c.id}" style="flex:1"><button class="btn btn-danger btn-sm" data-col-del="${c.id}">✕</button></div>`).join("")}</div>
+      <div style="display:flex;gap:.4rem;margin-top:.4rem"><input type="text" class="admin-input" id="newColName" placeholder="新专栏名称" style="flex:1"><input type="text" class="admin-input" id="newColIcon" placeholder="图标" style="width:60px" maxlength="4" value="📌"><button class="btn btn-ghost btn-sm" id="addColBtn">+</button></div>
+    </div>`;
+  document.querySelectorAll(".admin-post-item").forEach(el=>{el.addEventListener("click",function(){editingPostId=this.dataset.id;renderAdminEditor(blogData.posts.find(p=>p.id===editingPostId));});});
+  document.getElementById("adminNewPostBtn").addEventListener("click",()=>{editingPostId="new";renderAdminEditor(null);});
+  document.getElementById("adminPublishBtn").addEventListener("click",publishBlog);
+  document.getElementById("addColBtn").addEventListener("click",()=>{const n=document.getElementById("newColName").value.trim();const ic=document.getElementById("newColIcon").value.trim()||"📌";if(n){blogData.columns.push({id:slugify(n),name:n,icon:ic});saveBlogData();renderAdminDashboard();renderSidebar();renderHeaderNav();}});
+  document.querySelectorAll("[data-col-del]").forEach(b=>{b.addEventListener("click",function(){const id=this.dataset.colDel;blogData.columns=blogData.columns.filter(c=>c.id!==id);saveBlogData();renderAdminDashboard();renderSidebar();renderHeaderNav();});});
+  document.querySelectorAll("[data-col-id]").forEach(inp=>{inp.addEventListener("change",function(){const id=this.dataset.colId;const col=blogData.columns.find(c=>c.id===id);if(col){const m=this.value.match(/^(\S+)\s+(.+)/);if(m){col.icon=m[1];col.name=m[2];}else{col.name=this.value;}saveBlogData();renderSidebar();renderHeaderNav();}});});
 }
 
 function renderAdminEditor(post){
   const isNew=!post;
   const p=isNew?{id:"",title:"",slug:"",column:blogData.columns[0]?.id||"",tags:[],content:"",summary:"",publishedAt:new Date().toISOString().slice(0,10)}:post;
-  const body=document.getElementById("adminBody");
-  body.innerHTML=`
-    <div class="admin-section"><button class="btn btn-ghost btn-sm" id="adminBackBtn">← 返回列表</button></div>
-    <div class="admin-section"><div class="admin-label">标题</div><input type="text" class="admin-input" id="adminTitle" value="${escapeHtml(p.title)}" placeholder="文章标题"></div>
-    <div class="admin-section"><div class="admin-label">专栏</div><select class="admin-select" id="adminColumn">${blogData.columns.map(c=>`<option value="${c.id}" ${p.column===c.id?"selected":""}>${c.icon} ${c.name}</option>`).join("")}</select></div>
-    <div class="admin-section"><div class="admin-label">标签 (逗号分隔)</div><input type="text" class="admin-input" id="adminTags" value="${(p.tags||[]).join(",")}" placeholder="React,JavaScript,前端"></div>
-    <div class="admin-section"><div class="admin-label">摘要 (留空自动截取)</div><input type="text" class="admin-input" id="adminSummary" value="${escapeHtml(p.summary||"")}" placeholder="简短描述"></div>
-    <div class="admin-section"><div class="admin-label">日期</div><input type="date" class="admin-input" id="adminDate" value="${p.publishedAt?p.publishedAt.slice(0,10):""}"></div>
-    <div class="admin-section">
-      <div class="md-tab-bar"><button class="md-tab active" data-tab="write">✍️ 编写</button><button class="md-tab" data-tab="preview">👁️ 预览</button></div>
-      <textarea class="admin-textarea" id="adminContent" placeholder="Markdown 内容...">${escapeHtml(p.content||"")}</textarea>
-      <div class="admin-preview" id="adminPreview" style="display:none"></div>
-    </div>
-    <div class="admin-actions">
-      <button class="btn btn-primary btn-sm" id="adminSaveBtn">💾 保存</button>
-      ${!isNew?`<button class="btn btn-danger btn-sm" id="adminDeleteBtn">🗑 删除</button>`:""}
+  document.getElementById("mainArea").innerHTML=`
+    <div class="admin-editor">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem">
+        <button class="btn btn-ghost btn-sm" id="adminBackBtn">← 返回列表</button>
+        <div class="admin-actions" style="margin-top:0">
+          <button class="btn btn-primary btn-sm" id="adminSaveBtn">💾 保存</button>
+          ${!isNew?`<button class="btn btn-danger btn-sm" id="adminDeleteBtn">🗑 删除</button>`:""}
+        </div>
+      </div>
+      <div class="admin-editor-top">
+        <input type="text" class="admin-input" id="adminTitle" value="${escapeHtml(p.title)}" placeholder="文章标题" style="font-size:1.5rem">
+        <select class="admin-select" id="adminColumn" style="width:auto">${blogData.columns.map(c=>`<option value="${c.id}" ${p.column===c.id?"selected":""}>${c.icon} ${c.name}</option>`).join("")}</select>
+        <input type="text" class="admin-input" id="adminTags" value="${(p.tags||[]).join(",")}" placeholder="标签,逗号分隔" style="max-width:200px">
+        <input type="text" class="admin-input" id="adminSummary" value="${escapeHtml(p.summary||"")}" placeholder="摘要(留空自动截取)" style="max-width:200px">
+        <input type="date" class="admin-input" id="adminDate" value="${p.publishedAt?p.publishedAt.slice(0,10):""}" style="max-width:140px">
+      </div>
+      <div class="editor-split">
+        <div class="split-left">
+          <textarea class="editor-textarea" id="adminContent" placeholder="Markdown 内容...">${escapeHtml(p.content||"")}</textarea>
+        </div>
+        <div class="split-right">
+          <div class="editor-preview" id="adminPreview"></div>
+        </div>
+      </div>
     </div>`;
-  document.getElementById("adminBackBtn").addEventListener("click",()=>{editingPostId=null;renderAdminPanel();});
-  document.querySelectorAll(".md-tab").forEach(tab=>{tab.addEventListener("click",function(){const t=this.dataset.tab;document.querySelectorAll(".md-tab").forEach(x=>x.classList.remove("active"));this.classList.add("active");document.getElementById("adminContent").style.display=t==="write"?"block":"none";document.getElementById("adminPreview").style.display=t==="preview"?"block":"none";if(t==="preview"){document.getElementById("adminPreview").innerHTML=renderMarkdown(document.getElementById("adminContent").value);}});});
+  const updatePreview=()=>{document.getElementById("adminPreview").innerHTML=renderMarkdown(document.getElementById("adminContent").value);};
+  document.getElementById("adminContent").addEventListener("input",updatePreview);
+  updatePreview();
+  document.getElementById("adminBackBtn").addEventListener("click",()=>{editingPostId=null;renderAdminDashboard();});
   document.getElementById("adminSaveBtn").addEventListener("click",()=>savePost(isNew,p));
-  if(!isNew){document.getElementById("adminDeleteBtn").addEventListener("click",()=>{if(confirm("确定删除《"+p.title+"》？")){blogData.posts=blogData.posts.filter(x=>x.id!==p.id);saveBlogData();editingPostId=null;renderAdminPanel();renderView();toast("已删除","info");}});}
+  if(!isNew){document.getElementById("adminDeleteBtn").addEventListener("click",()=>{if(confirm("确定删除《"+p.title+"》？")){blogData.posts=blogData.posts.filter(x=>x.id!==p.id);saveBlogData();editingPostId=null;renderAdminDashboard();renderView();toast("已删除","info");}});}
 }
 
 function savePost(isNew,oldPost){
@@ -542,7 +543,7 @@ function savePost(isNew,oldPost){
     if(post){post.title=title;post.slug=slug;post.column=column;post.tags=tags;post.content=content;post.summary=summary;post.publishedAt=pubDate;post.updatedAt=new Date().toISOString();}
   }
   blogData.posts.sort((a,b)=>new Date(b.publishedAt)-new Date(a.publishedAt));
-  saveBlogData();editingPostId=null;renderAdminPanel();renderView();
+  saveBlogData();editingPostId=null;renderAdminDashboard();renderView();
   toast("已保存","success");
 }
 
@@ -563,7 +564,7 @@ document.getElementById("searchInput").addEventListener("keydown",function(e){
 // ===== KEYBOARD =====
 document.addEventListener("keydown",function(e){
   if((e.ctrlKey||e.metaKey)&&e.key==="k"){e.preventDefault();document.getElementById("searchInput").focus();}
-  if(e.key==="Escape"){closeDrawer();hidePasswordModal();}
+  if(e.key==="Escape"){if(isAdmin&&editingPostId){editingPostId=null;renderAdminDashboard();}else if(isAdmin){logoutAdmin();}hidePasswordModal();}
 });
 
 // ===== INIT =====
@@ -580,7 +581,7 @@ init();
 <script type="application/json" id="blogData">
 {
   "settings": {
-    "blogName": "Hy01er's Tech Blog",
+    "blogName": "Blog",
     "blogDesc": "嵌入式系统 · 硬件 · 蓝牙/WiFi · RTOS",
     "adminPasswordHash": "",
     "passwordSalt": "",
