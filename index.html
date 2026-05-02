@@ -63,10 +63,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 .read-time{display:flex;align-items:center;gap:.2rem}
 
 /* ===COLUMN COLORS=== */
-.col-frontend{background:rgba(0,212,255,.12);color:var(--accent)}
-.col-backend{background:rgba(16,240,144,.12);color:var(--accent5)}
-.col-system{background:rgba(249,115,22,.12);color:var(--accent4)}
-.col-ai{background:rgba(168,85,247,.15);color:var(--accent2)}
+.col-mcu{background:rgba(0,212,255,.12);color:var(--accent)}
+.col-hw{background:rgba(249,115,22,.12);color:var(--accent4)}
+.col-ble{background:rgba(168,85,247,.15);color:var(--accent2)}
+.col-wifi{background:rgba(16,240,144,.12);color:var(--accent5)}
+.col-rtos{background:rgba(255,61,90,.12);color:var(--red)}
+.col-tools{background:rgba(168,85,247,.1);color:var(--text2)}
 
 /* ===SINGLE POST=== */
 .post-article{animation:fadeUp .4s ease-out}
@@ -210,7 +212,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
     </div>
     <div class="sidebar-section">
       <div class="sidebar-title">关于</div>
-      <p class="about-text">一个技术博客，记录学习与思考。</p>
+      <p class="about-text">嵌入式系统 · 硬件设计 · 蓝牙/WiFi · RTOS<br>记录从底层到上层的技术之路。</p>
     </div>
   </aside>
   <main class="main-area" id="mainArea"></main>
@@ -246,7 +248,7 @@ try{marked.use({breaks:true,gfm:true});}catch(e){marked.setOptions({breaks:true,
 function renderMarkdown(md){let html=marked.parse(md||"");try{const temp=document.createElement("div");temp.innerHTML=html;temp.querySelectorAll("pre code").forEach(block=>{try{const lang=block.className.replace("language-","")||"";if(lang&&hljs.getLanguage(lang)){const r=hljs.highlight(block.textContent,{language:lang});block.innerHTML=r.value;block.className+=" hljs";}else{hljs.highlightElement(block);}}catch(e){}});html=temp.innerHTML;}catch(e){}return html;}
 
 // ===== BLOG DATA =====
-let blogData={settings:{blogName:"Hy01er's Tech Blog",blogDesc:"技术博客",adminPasswordHash:"",passwordSalt:"",adminSetup:true},columns:[{id:"frontend",name:"前端",icon:"🎨"},{id:"backend",name:"后端",icon:"⚙️"},{id:"system",name:"系统设计",icon:"🏗️"},{id:"ai",name:"AI & ML",icon:"🤖"}],posts:[]};
+let blogData={settings:{blogName:"Hy01er's Tech Blog",blogDesc:"嵌入式系统 · 硬件 · 蓝牙/WiFi · RTOS",adminPasswordHash:"",passwordSalt:"",adminSetup:true},columns:[{id:"mcu",name:"MCU & ARM",icon:"💻"},{id:"hw",name:"硬件设计",icon:"🔧"},{id:"ble",name:"蓝牙 BLE",icon:"📶"},{id:"wifi",name:"WiFi & 网络",icon:"🌐"},{id:"rtos",name:"RTOS",icon:"⏱️"},{id:"tools",name:"工具链",icon:"🛠️"}],posts:[]};
 let isAdmin=false,editingPostId=null;
 
 function loadBlogData(){
@@ -267,7 +269,7 @@ function formatDateShort(ds){if(!ds)return"";const d=new Date(ds);return `${d.ge
 function slugify(s){return s.toLowerCase().replace(/\s+/g,"-").replace(/[^\w一-鿿-]/g,"").replace(/-+/g,"-").replace(/^-|-$/g,"").substring(0,80)||"post";}
 function getColumn(colId){return blogData.columns.find(c=>c.id===colId);}
 function getAllTags(){const m=new Map();blogData.posts.forEach(p=>{(p.tags||[]).forEach(t=>m.set(t,(m.get(t)||0)+1));});return [...m.entries()].sort((a,b)=>b[1]-a[1]);}
-function colColorClass(colId){const map={frontend:"col-frontend",backend:"col-backend",system:"col-system",ai:"col-ai"};return map[colId]||"col-badge-default";}
+function colColorClass(colId){const map={mcu:"col-mcu",hw:"col-hw",ble:"col-ble",wifi:"col-wifi",rtos:"col-rtos",tools:"col-tools"};return map[colId]||"col-badge-default";}
 
 // ===== AUTH =====
 async function sha256(msg){const buf=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(msg));return btoa(String.fromCharCode(...new Uint8Array(buf)));}
@@ -579,16 +581,18 @@ init();
 {
   "settings": {
     "blogName": "Hy01er's Tech Blog",
-    "blogDesc": "技术博客",
+    "blogDesc": "嵌入式系统 · 硬件 · 蓝牙/WiFi · RTOS",
     "adminPasswordHash": "",
     "passwordSalt": "",
     "adminSetup": true
   },
   "columns": [
-    {"id": "frontend", "name": "前端", "icon": "🎨"},
-    {"id": "backend", "name": "后端", "icon": "⚙️"},
-    {"id": "system", "name": "系统设计", "icon": "🏗️"},
-    {"id": "ai", "name": "AI & ML", "icon": "🤖"}
+    {"id": "mcu", "name": "MCU & ARM", "icon": "💻"},
+    {"id": "hw", "name": "硬件设计", "icon": "🔧"},
+    {"id": "ble", "name": "蓝牙 BLE", "icon": "📶"},
+    {"id": "wifi", "name": "WiFi & 网络", "icon": "🌐"},
+    {"id": "rtos", "name": "RTOS", "icon": "⏱️"},
+    {"id": "tools", "name": "工具链", "icon": "🛠️"}
   ],
   "posts": []
 }
