@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✦ 星尘日记 · STARDUST JOURNAL</title>
+    <style>
+        :root {
+            --bg: #0a0a14; --surface: #12122a; --surface2: #1a1a35; --border: #252545;
+            --text: #e0e0f0; --text2: #a0a0c0; --text3: #6a6a8a;
+            --accent: #00e5ff; --accent2: #c77dff; --accent3: #ff2d95; --accent4: #ffd166; --accent5: #00ff88;
+            --star: #ffd166; --red: #ff4d6a; --orange: #ff9100;
+            --radius: 14px; --radius-sm: 8px;
+            --transition: 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+            --font: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { background:var(--bg); color:var(--text); font-family:var(--font); min-height:100vh; overflow-x:hidden;
+            -webkit-font-smoothing:antialiased; letter-spacing:0.3px; }
+        #starCanvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; }
+        .motivation-bar { position:fixed; top:0; left:0; right:0; z-index:50; padding:0.5rem 1.5rem;
+            background:linear-gradient(135deg, rgba(0,229,255,0.08), rgba(199,125,255,0.08));
+            border-bottom:1px solid var(--border); backdrop-filter:blur(15px); -webkit-backdrop-filter:blur(15px);
+            display:flex; justify-content:center; align-items:center; gap:2rem; flex-wrap:wrap; }
+        .motivation-bar .cn { font-size:0.9rem; font-weight:600; letter-spacing:1px;
+            background:linear-gradient(135deg, var(--accent4), var(--accent3)); -webkit-background-clip:text;
+            background-clip:text; -webkit-text-fill-color:transparent; }
+        .motivation-bar .en { font-size:0.75rem; color:var(--text2); font-style:italic; letter-spacing:0.5px; }
+        @media (max-width:600px) { .motivation-bar { gap:0.8rem; padding:0.4rem 1rem; }
+            .motivation-bar .cn { font-size:0.75rem; } .motivation-bar .en { font-size:0.65rem; } }
+        .app-container { position:relative; z-index:1; display:flex; min-height:100vh; padding-top:38px; }
+        .sidebar { width:270px; min-width:270px; background:rgba(18,18,42,0.85); backdrop-filter:blur(30px);
+            -webkit-backdrop-filter:blur(30px); border-right:1px solid var(--border); display:flex; flex-direction:column;
+            padding:1.2rem 0.8rem; position:sticky; top:0; height:calc(100vh - 38px); z-index:10;
+            transition:transform var(--transition); }
+        .sidebar-logo { font-size:1.3rem; font-weight:900; letter-spacing:3px; text-align:center; margin-bottom:0.8rem;
+            background:linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+            -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+            animation:logoPulse 3s ease-in-out infinite; }
+        @keyframes logoPulse { 0%,100%{ filter:brightness(1); } 50%{ filter:brightness(1.4); } }
+        .sidebar-status { text-align:center; font-size:0.65rem; color:var(--accent5); letter-spacing:2px;
+            margin-bottom:1rem; display:flex; align-items:center; justify-content:center; gap:0.3rem; }
+        .sidebar-nav { list-style:none; display:flex; flex-direction:column; gap:0.2rem; }
+        .sidebar-nav li a { display:flex; align-items:center; gap:0.6rem; padding:0.6rem 0.8rem;
+            border-radius:var(--radius-sm); text-decoration:none; color:var(--text2); font-size:0.85rem;
+            letter-spacing:1px; transition:all var(--transition); position:relative; font-weight:500; cursor:pointer; }
+        .sidebar-nav li a:hover, .sidebar-nav li a.active { color:#fff; background:rgba(0,229,255,0.08);
+            box-shadow:inset 0 0 0 1px rgba(0,229,255,0.2); }
+        .sidebar-nav li a.active::before { content:''; position:absolute; left:-0.4rem; top:50%;
+            transform:translateY(-50%); width:3px; height:16px; border-radius:3px; background:var(--accent);
+            box-shadow:0 0 12px var(--accent); }
+        .nav-icon { font-size:1.1rem; width:22px; text-align:center; }
+        .entry-count-badge { display:inline-block; padding:0.1rem 0.5rem; border-radius:20px; font-size:0.65rem;
+            font-weight:700; margin-left:auto; letter-spacing:1px; }
+        .badge-normal { background:rgba(0,229,255,0.15); color:var(--accent); }
+        .badge-trash { background:rgba(255,77,106,0.18); color:var(--red); }
+        .badge-star { background:rgba(255,209,102,0.18); color:var(--star); }
+        .sidebar-divider { border-top:1px solid var(--border); margin:0.4rem 0; opacity:0.5; }
+        .sidebar-footer { text-align:center; font-size:0.6rem; color:var(--text3); letter-spacing:2px; margin-top:0.5rem; }
+        /* 日历在导航正下方，不再推到底部 */
+        .sidebar-calendar { margin-top:0.6rem; border-top:1px solid var(--border); padding-top:0.6rem; }
+        .sidebar-calendar .cal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem; }
+        .sidebar-calendar .cal-header span { font-size:0.7rem; font-weight:700; letter-spacing:1px; color:#fff; }
+        .sidebar-calendar .cal-nav-btn { background:none; border:1px solid var(--border); color:var(--text2);
+            width:24px; height:24px; border-radius:50%; cursor:pointer; font-size:0.8rem; transition:all var(--transition);
+            display:flex; align-items:center; justify-content:center; }
+        .sidebar-calendar .cal-nav-btn:hover { border-color:var(--accent); color:#fff;
+            box-shadow:0 0 10px rgba(0,229,255,0.3); }
+        .sidebar-calendar .cal-weekdays { display:grid; grid-template-columns:repeat(7,1fr); text-align:center;
+            font-size:0.6rem; color:var(--text3); margin-bottom:0.2rem; }
+        .sidebar-calendar .cal-days { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; text-align:center; }
+        .sidebar-calendar .cal-day { aspect-ratio:1; display:flex; align-items:center; justify-content:center;
+            border-radius:50%; font-size:0.65rem; cursor:pointer; transition:all var(--transition); color:var(--text2);
+            position:relative; }
+        .sidebar-calendar .cal-day:hover { background:rgba(0,229,255,0.1); color:#fff; }
+        .sidebar-calendar .cal-day.today { border:1.5px solid var(--accent); color:#fff; font-weight:700;
+            box-shadow:0 0 10px rgba(0,229,255,0.25); }
+        .sidebar-calendar .cal-day.has-entry::after { content:''; position:absolute; bottom:1px;
+            width:4px; height:4px; border-radius:50%; background:var(--accent2); box-shadow:0 0 6px var(--accent2); }
+        .sidebar-calendar .cal-day.selected { background:var(--accent); color:#0a0a14; font-weight:700; }
+        .sidebar-calendar .cal-day.other-month { color:var(--text3); opacity:0.4; cursor:default; }
+        /* 主区域 */
+        .main-area { flex:1; display:flex; flex-direction:column; padding:1.5rem 2rem; gap:1.5rem;
+            max-width:1100px; margin:0 auto; width:100%; }
+        .top-bar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+        .top-bar h2 { font-size:1.5rem; font-weight:700; letter-spacing:2px; color:#fff; }
+        .top-bar h2 span { background:linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+        .top-actions { display:flex; gap:0.6rem; flex-wrap:wrap; }
+        .btn { padding:0.6rem 1.3rem; border-radius:50px; font-size:0.85rem; letter-spacing:1.5px; cursor:pointer;
+            font-weight:600; border:none; transition:all var(--transition); font-family:var(--font);
+            display:inline-flex; align-items:center; gap:0.4rem; white-space:nowrap; text-decoration:none; }
+        .btn-primary { background:linear-gradient(135deg, var(--accent), var(--accent2)); color:#0a0a14;
+            box-shadow:0 4px 25px rgba(0,229,255,0.3); }
+        .btn-primary:hover { box-shadow:0 6px 40px rgba(0,229,255,0.5); transform:translateY(-2px); filter:brightness(1.1); }
+        .btn-ghost { background:transparent; border:1.5px solid rgba(255,255,255,0.2); color:var(--text); }
+        .btn-ghost:hover { border-color:var(--accent); box-shadow:0 0 25px rgba(0,229,255,0.2); color:#fff; }
+        .btn-sm { padding:0.4rem 1rem; font-size:0.75rem; letter-spacing:1px; }
+        .btn-danger { background:transparent; border:1.5px solid rgba(255,77,106,0.4); color:var(--red); }
+        .btn-danger:hover { background:rgba(255,77,106,0.1); border-color:var(--red); box-shadow:0 0 25px rgba(255,77,106,0.25); }
+        .btn-danger-solid { background:rgba(255,77,106,0.85); border:none; color:#fff; }
+        .btn-danger-solid:hover { background:var(--red); box-shadow:0 0 30px rgba(255,77,106,0.5); transform:translateY(-2px); }
+        .btn-success { background:transparent; border:1.5px solid rgba(0,255,136,0.4); color:var(--accent5); }
+        .btn-success:hover { background:rgba(0,255,136,0.1); border-color:var(--accent5); box-shadow:0 0 25px rgba(0,255,136,0.25); }
+        .btn-star { background:rgba(255,209,102,0.15); border:1.5px solid rgba(255,209,102,0.4); color:var(--star); }
+        .btn-star:hover { background:rgba(255,209,102,0.25); border-color:var(--star); box-shadow:0 0 25px rgba(255,209,102,0.3); }
+        .btn-star.active-star { background:var(--star); color:#0a0a14; border-color:var(--star); }
+        .editor-panel { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+            padding:1.5rem; box-shadow:0 0 40px rgba(0,229,255,0.06); display:flex; flex-direction:column;
+            gap:1rem; animation:fadeSlideIn 0.4s ease-out; }
+        @keyframes fadeSlideIn { from{ opacity:0; transform:translateY(20px); } to{ opacity:1; transform:translateY(0); } }
+        .editor-meta { display:flex; gap:1rem; flex-wrap:wrap; align-items:center; }
+        .editor-date { font-size:0.9rem; color:var(--accent); font-weight:600; letter-spacing:2px; display:flex; align-items:center; gap:0.4rem; }
+        .editor-title-input { flex:1; min-width:200px; background:transparent; border:none; border-bottom:2px solid var(--border);
+            color:#fff; font-size:1.4rem; font-weight:700; padding:0.4rem 0; letter-spacing:1px; font-family:var(--font);
+            transition:border-color var(--transition); outline:none; }
+        .editor-title-input:focus { border-bottom-color:var(--accent); }
+        .mood-selector { display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center; }
+        .mood-selector>span { font-size:0.8rem; color:var(--text3); letter-spacing:2px; }
+        .mood-btn { font-size:1.5rem; padding:0.4rem 0.7rem; border-radius:50px; background:rgba(255,255,255,0.03);
+            border:1.5px solid transparent; cursor:pointer; transition:all var(--transition); filter:grayscale(0.4); line-height:1; }
+        .mood-btn:hover { filter:grayscale(0); transform:scale(1.15); border-color:rgba(255,255,255,0.2); }
+        .mood-btn.selected { filter:grayscale(0); border-color:var(--accent); background:rgba(0,229,255,0.1);
+            box-shadow:0 0 20px rgba(0,229,255,0.3); transform:scale(1.1); }
+        .format-toolbar { display:flex; gap:0.3rem; flex-wrap:wrap; padding:0.6rem 0; border-bottom:1px solid var(--border); }
+        .fmt-btn { width:34px; height:34px; border-radius:6px; background:transparent; border:1px solid transparent;
+            color:var(--text2); cursor:pointer; font-size:0.85rem; transition:all var(--transition);
+            display:flex; align-items:center; justify-content:center; font-family:var(--font); font-weight:600; }
+        .fmt-btn:hover { background:rgba(0,229,255,0.08); border-color:rgba(0,229,255,0.3); color:#fff; }
+        .fmt-sep { width:1px; background:var(--border); margin:0 0.4rem; align-self:stretch; }
+        .editor-content { min-height:280px; background:rgba(0,0,0,0.2); border:1px solid var(--border);
+            border-radius:var(--radius-sm); padding:1.2rem; color:var(--text); font-size:1rem; line-height:1.8;
+            outline:none; overflow-y:auto; font-family:var(--font); letter-spacing:0.3px; transition:border-color var(--transition); }
+        .editor-content:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(0,229,255,0.05); }
+        .editor-content:empty::before { content:'在这里写下你的想法... ✦'; color:var(--text3); pointer-events:none; }
+        .editor-content h1,.editor-content h2,.editor-content h3 { color:#fff; margin:1rem 0 0.5rem; letter-spacing:1px; }
+        .editor-content h1 { font-size:1.6rem; border-bottom:2px solid var(--border); padding-bottom:0.3rem; }
+        .editor-content h2 { font-size:1.3rem; }
+        .editor-content h3 { font-size:1.1rem; color:var(--accent2); }
+        .editor-content ul,.editor-content ol { padding-left:1.5rem; margin:0.5rem 0; }
+        .editor-content li { margin:0.3rem 0; }
+        .editor-content code { background:rgba(199,125,255,0.15); padding:0.15rem 0.5rem; border-radius:4px;
+            font-family:'JetBrains Mono','Fira Code',monospace; font-size:0.9em; color:var(--accent2); }
+        .editor-content pre { background:rgba(0,0,0,0.4); border:1px solid var(--border); border-radius:var(--radius-sm);
+            padding:1rem; overflow-x:auto; margin:0.8rem 0; }
+        .editor-content pre code { background:none; padding:0; color:var(--accent4); }
+        .editor-content blockquote { border-left:3px solid var(--accent); padding-left:1rem; margin:0.8rem 0;
+            color:var(--text2); font-style:italic; }
+        .editor-content a { color:var(--accent); text-decoration:underline; text-underline-offset:3px; }
+        .editor-content hr { border:none; border-top:1px solid var(--border); margin:1.5rem 0; }
+        .tag-input-area { display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap; }
+        .tag-input-area label { font-size:0.8rem; color:var(--text3); letter-spacing:2px; white-space:nowrap; }
+        .tag-list { display:flex; gap:0.4rem; flex-wrap:wrap; }
+        .tag { display:inline-flex; align-items:center; gap:0.3rem; padding:0.3rem 0.7rem; border-radius:20px;
+            background:rgba(199,125,255,0.12); color:var(--accent2); font-size:0.75rem; letter-spacing:1px;
+            font-weight:500; border:1px solid rgba(199,125,255,0.25); }
+        .tag .tag-remove { cursor:pointer; font-size:0.9rem; line-height:1; opacity:0.6; transition:opacity var(--transition); margin-left:2px; }
+        .tag .tag-remove:hover { opacity:1; color:var(--red); }
+        .tag-add-input { background:transparent; border:1px dashed var(--border); color:var(--text2); padding:0.3rem 0.7rem;
+            border-radius:20px; font-size:0.75rem; width:90px; outline:none; font-family:var(--font);
+            letter-spacing:1px; transition:border-color var(--transition); }
+        .tag-add-input:focus { border-color:var(--accent2); color:#fff; }
+        .editor-actions { display:flex; gap:0.8rem; flex-wrap:wrap; justify-content:flex-end; }
+        .entries-list { display:flex; flex-direction:column; gap:0.8rem; }
+        .entry-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+            padding:1.2rem 1.5rem; cursor:pointer; transition:all var(--transition); position:relative;
+            overflow:hidden; animation:fadeSlideIn 0.35s ease-out; }
+        .entry-card:hover { border-color:rgba(0,229,255,0.4); box-shadow:0 8px 35px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,229,255,0.15); transform:translateX(4px); }
+        .entry-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+            background:linear-gradient(180deg, var(--accent), var(--accent2)); border-radius:3px; opacity:0; transition:opacity var(--transition); }
+        .entry-card:hover::before { opacity:1; }
+        .entry-card-header { display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; flex-wrap:wrap; }
+        .entry-card-title { font-size:1.1rem; font-weight:700; color:#fff; letter-spacing:1px; }
+        .entry-card-date { font-size:0.78rem; color:var(--accent); letter-spacing:2px; white-space:nowrap; }
+        .entry-card-preview { color:var(--text2); font-size:0.85rem; margin-top:0.5rem; line-height:1.6;
+            display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+        .entry-card-meta { display:flex; gap:0.8rem; margin-top:0.8rem; flex-wrap:wrap; align-items:center; }
+        .entry-card-mood { font-size:1.3rem; }
+        .entry-card-tags { display:flex; gap:0.3rem; flex-wrap:wrap; }
+        .entry-card-actions { display:flex; gap:0.4rem; margin-top:0.6rem; opacity:0; transition:opacity var(--transition); }
+        .entry-card:hover .entry-card-actions { opacity:1; }
+        .star-toggle { font-size:1.3rem; cursor:pointer; transition:all var(--transition); background:none; border:none; color:var(--text3); }
+        .star-toggle:hover { transform:scale(1.3); }
+        .star-toggle.starred { color:var(--star); filter:drop-shadow(0 0 8px var(--star)); }
+        .no-entries { text-align:center; padding:4rem 2rem; color:var(--text3); letter-spacing:2px; }
+        .no-entries .icon { font-size:4rem; display:block; margin-bottom:1rem; animation:floatIcon 3s ease-in-out infinite; }
+        @keyframes floatIcon { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-15px); } }
+        .search-bar { display:flex; gap:0.5rem; align-items:center; }
+        .search-input { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:50px;
+            padding:0.6rem 1.2rem; color:#fff; font-size:0.9rem; outline:none; font-family:var(--font);
+            letter-spacing:1px; transition:all var(--transition); min-width:180px; }
+        .search-input:focus { border-color:var(--accent); box-shadow:0 0 25px rgba(0,229,255,0.15); }
+        .search-input::placeholder { color:var(--text3); }
+        .toast-container { position:fixed; top:1.5rem; right:1.5rem; z-index:9999; display:flex; flex-direction:column; gap:0.6rem; }
+        .toast { padding:0.8rem 1.5rem; border-radius:50px; font-size:0.85rem; font-weight:600; letter-spacing:1px;
+            animation:toastIn 0.4s ease-out, toastOut 0.4s 2.2s ease-out forwards; backdrop-filter:blur(15px);
+            -webkit-backdrop-filter:blur(15px); border:1px solid; }
+        .toast-success { background:rgba(0,255,136,0.15); border-color:rgba(0,255,136,0.4); color:var(--accent5); }
+        .toast-info { background:rgba(0,229,255,0.15); border-color:rgba(0,229,255,0.4); color:var(--accent); }
+        .toast-warn { background:rgba(255,145,0,0.15); border-color:rgba(255,145,0,0.4); color:var(--orange); }
+        @keyframes toastIn { from{ opacity:0; transform:translateX(80px); } to{ opacity:1; transform:translateX(0); } }
+        @keyframes toastOut { from{ opacity:1; } to{ opacity:0; transform:translateY(-30px); } }
+        .modal-overlay { position:fixed; inset:0; z-index:500; background:rgba(0,0,0,0.7); backdrop-filter:blur(6px);
+            -webkit-backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; }
+        .modal-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem;
+            max-width:440px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.6); }
+        .modal-icon { font-size:3.5rem; margin-bottom:1rem; }
+        .modal-title { font-size:1.2rem; font-weight:700; color:#fff; letter-spacing:2px; margin-bottom:0.6rem; }
+        .modal-desc { font-size:0.85rem; color:var(--text2); margin-bottom:1.5rem; line-height:1.7; }
+        .modal-actions { display:flex; gap:0.8rem; justify-content:center; flex-wrap:wrap; }
+        @media (max-width:900px) {
+            .sidebar { position:fixed; left:0; top:0; transform:translateX(-100%); z-index:100; transition:transform var(--transition); }
+            .sidebar.open { transform:translateX(0); box-shadow:0 0 80px rgba(0,0,0,0.7); }
+            .main-area { padding:1rem; }
+            .mobile-menu-btn { display:flex !important; }
+            .editor-title-input { font-size:1.1rem; }
+        }
+        @media (min-width:901px) { .mobile-menu-btn { display:none !important; } }
+        .mobile-menu-btn { position:fixed; top:0.8rem; left:0.8rem; z-index:101; width:40px; height:40px; border-radius:50%;
+            background:var(--surface); border:1px solid var(--border); color:#fff; font-size:1.3rem; cursor:pointer;
+            display:none; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(0,0,0,0.4); }
+        .overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:99; display:none; }
+        .overlay.show { display:block; }
+    </style>
+</head>
+<body>
+    <canvas id="starCanvas"></canvas>
+    <div class="motivation-bar" id="motivationBar">
+        <span class="cn" id="motivationCN">每一天都是新的开始 ✦</span>
+        <span class="en" id="motivationEN">Every day is a fresh start.</span>
+    </div>
+    <div class="toast-container" id="toastContainer"></div>
+    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="菜单">☰</button>
+    <div class="overlay" id="overlay"></div>
+    <div class="app-container" id="appContainer">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">✦ 星尘日记</div>
+            <!-- 导航菜单 -->
+            <ul class="sidebar-nav">
+                <li><a class="active" data-view="editor"><span class="nav-icon">✍️</span> 写日记</a></li>
+                <li><a data-view="list"><span class="nav-icon">📖</span> 全部日记 <span class="entry-count-badge badge-normal" id="entryCountBadge">0</span></a></li>
+                <li><a data-view="starred"><span class="nav-icon">⭐</span> 星标日记 <span class="entry-count-badge badge-star" id="starCountBadge">0</span></a></li>
+                <li><a data-view="search"><span class="nav-icon">🔍</span> 搜索</a></li>
+                <li class="sidebar-divider"></li>
+                <li><a data-view="trash"><span class="nav-icon">🗑️</span> 回收站 <span class="entry-count-badge badge-trash" id="trashCountBadge">0</span></a></li>
+                <li class="sidebar-divider"></li>
+                <li><a id="navExport"><span class="nav-icon">📥</span> 导出加密备份</a></li>
+                <li><a id="navImport"><span class="nav-icon">📤</span> 导入加密备份</a></li>
+            </ul>
+            <!-- 整月日历，位于导航正下方 -->
+            <div class="sidebar-calendar" id="sidebarCalendarContainer"></div>
+            <div class="sidebar-footer">🔐 AES-256 · 2025</div>
+        </aside>
+        <main class="main-area" id="mainArea"></main>
+    </div>
+    <input type="file" id="importFileInput" accept=".json,.sdf" style="display:none;">
+
+    <script>
+        (function() {
+            const sc = document.getElementById('starCanvas'), sctx = sc.getContext('2d');
+            let stars = [];
+            function resizeSC() { sc.width = innerWidth; sc.height = innerHeight; }
+            function initStars() { stars = []; for(let i=0;i<200;i++) stars.push({ x:Math.random()*sc.width, y:Math.random()*sc.height, r:Math.random()*1.6+0.4, ts:Math.random()*0.02+0.005, to:Math.random()*Math.PI*2, hue:[200,270,340,40][Math.floor(Math.random()*4)] }); }
+            function drawStars(t) { sctx.clearRect(0,0,sc.width,sc.height); stars.forEach(s=>{ const a=0.35+Math.sin(t*s.ts+s.to)*0.35; sctx.beginPath(); sctx.arc(s.x,s.y,s.r,0,Math.PI*2); sctx.fillStyle=`hsla(${s.hue},80%,75%,${a})`; sctx.fill(); if(s.r>1.1&&a>0.55){ sctx.beginPath(); sctx.arc(s.x,s.y,s.r*2.5,0,Math.PI*2); sctx.fillStyle=`hsla(${s.hue},80%,75%,${a*0.12})`; sctx.fill(); } }); requestAnimationFrame(drawStars); }
+            resizeSC(); initStars(); requestAnimationFrame(drawStars);
+            window.addEventListener('resize',()=>{ resizeSC(); initStars(); });
+
+            const STORAGE_KEY = 'sdj_enc', KEY_STORAGE_KEY = 'sdj_key', IV_LEN = 12, TRASH_DAYS = 30;
+            let aesKey = null, entries = [], currentView = 'editor', editingEntryId = null, selectedDate = null;
+            let calendarMonth = new Date().getMonth(), calendarYear = new Date().getFullYear(), searchQuery = '';
+
+            function ab2b64(b) { return btoa(String.fromCharCode(...new Uint8Array(b))); }
+            function b642ab(b64) { const b = atob(b64); return new Uint8Array(b.length).map((_,i)=>b.charCodeAt(i)).buffer; }
+            async function genKey() { return crypto.subtle.generateKey({name:'AES-GCM',length:256},true,['encrypt','decrypt']); }
+            async function expKey(k) { return ab2b64(await crypto.subtle.exportKey('raw',k)); }
+            async function impKey(b64) { return crypto.subtle.importKey('raw',b642ab(b64),{name:'AES-GCM'},true,['encrypt','decrypt']); }
+            async function getKey() {
+                const s = localStorage.getItem(KEY_STORAGE_KEY);
+                if(s) { try { aesKey = await impKey(s); return; } catch(e){} }
+                aesKey = await genKey(); localStorage.setItem(KEY_STORAGE_KEY, await expKey(aesKey));
+            }
+            async function enc(data) { const iv=crypto.getRandomValues(new Uint8Array(IV_LEN)); const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},aesKey,new TextEncoder().encode(data)); return {v:2, iv:ab2b64(iv), data:ab2b64(ct)}; }
+            async function dec(obj) { const iv=b642ab(obj.iv), ct=b642ab(obj.data); const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv},aesKey,ct); return new TextDecoder().decode(pt); }
+            function loadEnc() { try{ const r=localStorage.getItem(STORAGE_KEY); return r?JSON.parse(r):null; }catch(e){return null;} }
+            function saveEnc(obj) { localStorage.setItem(STORAGE_KEY, JSON.stringify(obj)); }
+            async function loadEntries() { const e=loadEnc(); if(!e){ entries=[]; return; } try{ const p=await dec(e); entries=JSON.parse(p); if(!Array.isArray(entries)) entries=[]; }catch(ex){ entries=[]; } sortEntries(); }
+            async function persistEntries() { const p=JSON.stringify(entries); saveEnc(await enc(p)); }
+            function sortEntries() { entries.sort((a,b)=>b.createdAt.localeCompare(a.createdAt)); }
+            function getActive() { return entries.filter(e=>!e.deleted); }
+            function getTrash() { return entries.filter(e=>e.deleted); }
+            function getStarred() { return entries.filter(e=>e.starred && !e.deleted); }
+            function softDel(id) { const e=entries.find(x=>x.id===id); if(e){ e.deleted=true; e.deletedAt=new Date().toISOString(); } }
+            function restore(id) { const e=entries.find(x=>x.id===id); if(e){ e.deleted=false; e.deletedAt=null; } }
+            function permDel(id) { entries=entries.filter(e=>e.id!==id); }
+            function permDelAll() { entries=entries.filter(e=>!e.deleted); }
+            function toggleStar(id) { const e=entries.find(x=>x.id===id); if(e) e.starred = !e.starred; }
+            function autoClean() { const now=new Date(); entries=entries.filter(e=>{ if(e.deleted&&e.deletedAt){ if((now-new Date(e.deletedAt))/86400000 > TRASH_DAYS) return false; } return true; }); }
+            function todayStr() { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+            function formatDate(ds) { const p=ds.split('-'); return `${p[0]}年${parseInt(p[1])}月${parseInt(p[2])}日`; }
+            function nowISO() { return new Date().toISOString(); }
+
+            function toast(msg,ty='info') { const c=document.getElementById('toastContainer'); const t=document.createElement('div'); t.className=`toast toast-${ty}`; t.textContent=msg; c.appendChild(t); setTimeout(()=>t.remove(),2800); }
+            function confirmModal(title,desc,icon,confirmLabel,confirmClass,onConfirm) {
+                const ex=document.querySelector('.modal-overlay'); if(ex) ex.remove();
+                const ov=document.createElement('div'); ov.className='modal-overlay';
+                ov.innerHTML=`<div class="modal-box"><div class="modal-icon">${icon}</div><div class="modal-title">${title}</div><div class="modal-desc">${desc}</div><div class="modal-actions"><button class="btn btn-ghost btn-sm" id="modalCancelBtn">取消</button><button class="btn ${confirmClass} btn-sm" id="modalConfirmBtn">${confirmLabel}</button></div></div>`;
+                document.body.appendChild(ov);
+                ov.querySelector('#modalCancelBtn').addEventListener('click',()=>ov.remove());
+                ov.addEventListener('click',function(e){ if(e.target===ov) ov.remove(); });
+                ov.querySelector('#modalConfirmBtn').addEventListener('click',()=>{ ov.remove(); if(onConfirm) onConfirm(); });
+            }
+
+            const quotes = [
+                {cn:'每一天都是新的开始 ✦', en:'Every day is a fresh start.'},
+                {cn:'你比自己想象的更强大 💪', en:'You are stronger than you think.'},
+                {cn:'星光不负赶路人 🌟', en:'Starlight rewards the persistent.'},
+                {cn:'坚持是无声的力量 🕯️', en:'Persistence is silent strength.'},
+                {cn:'写下的每个字都是未来 📝', en:'Every word written shapes tomorrow.'},
+                {cn:'今天也是闪闪发光的一天 ✨', en:'Today is another shining day.'},
+                {cn:'梦想不会发光，发光的是追梦的你 🌙', en:'Dreams don\'t glow, you do.'},
+                {cn:'慢慢来，比较快 🐢', en:'Slow is smooth, smooth is fast.'},
+                {cn:'内心有光，脚下有路 🚀', en:'Light within, path ahead.'},
+                {cn:'勿忘初心，方得始终 🏁', en:'Stay true, reach the end.'},
+                {cn:'每一个清晨都是重启的机会 ⏰', en:'Every morning is a reset.'},
+                {cn:'你值得所有的美好 🌈', en:'You deserve all the good.'},
+            ];
+            function updateMotivation() {
+                const h = new Date().getHours();
+                const idx = h % quotes.length;
+                const q = quotes[idx];
+                document.getElementById('motivationCN').textContent = q.cn;
+                document.getElementById('motivationEN').textContent = q.en;
+            }
+
+            const sidebar = document.getElementById('sidebar'), overlay = document.getElementById('overlay');
+            const mobileBtn = document.getElementById('mobileMenuBtn'), mainArea = document.getElementById('mainArea');
+            function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('show'); }
+            function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('show'); }
+            mobileBtn.addEventListener('click',()=>sidebar.classList.contains('open')?closeSidebar():openSidebar());
+            overlay.addEventListener('click',closeSidebar);
+
+            document.querySelectorAll('.sidebar-nav a[data-view]').forEach(a=>{
+                a.addEventListener('click',function(e){ e.preventDefault(); currentView=this.getAttribute('data-view');
+                    editingEntryId=null; selectedDate=null; searchQuery=''; updateActiveNav(); renderView(); closeSidebar(); });
+            });
+            document.getElementById('navExport').addEventListener('click',async function(e){ e.preventDefault(); await exportEnc(); closeSidebar(); });
+            document.getElementById('navImport').addEventListener('click',function(e){ e.preventDefault(); document.getElementById('importFileInput').click(); closeSidebar(); });
+            document.getElementById('importFileInput').addEventListener('change',async function(e){
+                const f=e.target.files[0]; if(!f) return; const r=new FileReader();
+                r.onload=async function(ev){
+                    try{ const d=JSON.parse(ev.target.result);
+                        if(d._type==='stardust_encrypted'||(d.v&&d.iv&&d.data&&d._key)){
+                            const tk=await impKey(d._key); const iv=b642ab(d.iv); const ct=b642ab(d.data);
+                            const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:iv},tk,ct);
+                            const imp=JSON.parse(new TextDecoder().decode(pt));
+                            if(!Array.isArray(imp)) throw new Error('格式错');
+                            mergeImported(imp);
+                        } else if(d._type==='stardust_plain'&&Array.isArray(d.entries)){ mergeImported(d.entries); }
+                        else throw new Error('无法识别');
+                    }catch(err){ toast('导入失败：'+err.message,'warn'); }
+                }; r.readAsText(f); this.value='';
+            });
+            function mergeImported(imp) { const ids=new Set(entries.map(e=>e.id)); let added=0; imp.forEach(item=>{ if(!ids.has(item.id)){ entries.push(item); ids.add(item.id); added++; } }); sortEntries(); persistEntries().then(()=>{ updateBadges(); renderView(); toast(`成功导入 ${added} 篇 ✦`,'success'); }); }
+            async function exportEnc() { const p=JSON.stringify(entries); const ed=await enc(p); ed._key=await expKey(aesKey); ed._type='stardust_encrypted'; const b=new Blob([JSON.stringify(ed,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`stardust-backup-${todayStr()}.json`; a.click(); toast('加密备份已下载 ✦','success'); }
+
+            function updateActiveNav() {
+                document.querySelectorAll('.sidebar-nav a').forEach(a=>a.classList.remove('active'));
+                const act=document.querySelector(`.sidebar-nav a[data-view="${currentView}"]`);
+                if(act) act.classList.add('active');
+                updateBadges();
+            }
+            function updateBadges() {
+                const eb=document.getElementById('entryCountBadge'), tb=document.getElementById('trashCountBadge'), sb=document.getElementById('starCountBadge');
+                if(eb) eb.textContent=getActive().length; if(tb) tb.textContent=getTrash().length; if(sb) sb.textContent=getStarred().length;
+            }
+            function renderView() { updateActiveNav(); updateBadges();
+                switch(currentView){ case'editor':renderEditor();break; case'list':renderList();break; case'starred':renderStarred();break; case'search':renderSearch();break; case'trash':renderTrash();break; default:renderEditor(); }
+                renderSidebarCalendar(selectedDate || todayStr());
+            }
+
+            function renderSidebarCalendar(activeDateStr) {
+                const c=document.getElementById('sidebarCalendarContainer'); if(!c) return;
+                const datesWithEntries = new Set(getActive().map(e=>e.date));
+                const monthNames=['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+                const weekdays=['日','一','二','三','四','五','六'];
+                const fd=new Date(calendarYear,calendarMonth,1).getDay(), dim=new Date(calendarYear,calendarMonth+1,0).getDate();
+                const prevDim=new Date(calendarYear,calendarMonth,0).getDate();
+                const today = todayStr(), activeDate = activeDateStr || today;
+                let days='';
+                for(let i=fd-1;i>=0;i--){ const d=prevDim-i, m=calendarMonth===0?12:calendarMonth, y=calendarMonth===0?calendarYear-1:calendarYear; days+=`<div class="cal-day other-month" data-date="${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}">${d}</div>`; }
+                for(let d=1;d<=dim;d++){ const ds=`${calendarYear}-${String(calendarMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; let cls='cal-day'; if(ds===today) cls+=' today'; if(ds===activeDate) cls+=' selected'; if(datesWithEntries.has(ds)) cls+=' has-entry'; days+=`<div class="${cls}" data-date="${ds}">${d}</div>`; }
+                const rem=7-((fd+dim)%7);
+                if(rem<7){ for(let d=1;d<=rem;d++){ const m=calendarMonth===11?1:calendarMonth+2, y=calendarMonth===11?calendarYear+1:calendarYear; days+=`<div class="cal-day other-month" data-date="${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}">${d}</div>`; } }
+                c.innerHTML=`<div class="cal-header"><button class="cal-nav-btn" id="calPrev">◀</button><span>${monthNames[calendarMonth]} ${calendarYear}</span><button class="cal-nav-btn" id="calNext">▶</button></div><div class="cal-weekdays">${weekdays.map(w=>`<div>${w}</div>`).join('')}</div><div class="cal-days">${days}</div>`;
+                c.querySelectorAll('.cal-day:not(.other-month)').forEach(el=>{ el.addEventListener('click',function(){ const ds=this.getAttribute('data-date'); selectedDate=ds; editingEntryId=null; const existing=getActive().filter(e=>e.date===ds); if(existing.length===1) editingEntryId=existing[0].id; else if(existing.length>1) editingEntryId=existing[0].id; currentView='editor'; renderView(); }); });
+                c.querySelectorAll('.cal-day.other-month').forEach(el=>{ el.addEventListener('click',function(){ const ds=this.getAttribute('data-date'); const p=ds.split('-'); calendarYear=parseInt(p[0]); calendarMonth=parseInt(p[1])-1; selectedDate=ds; editingEntryId=null; currentView='editor'; renderView(); }); });
+                document.getElementById('calPrev').addEventListener('click',()=>{ calendarMonth--; if(calendarMonth<0){ calendarMonth=11; calendarYear--; } renderSidebarCalendar(activeDateStr); });
+                document.getElementById('calNext').addEventListener('click',()=>{ calendarMonth++; if(calendarMonth>11){ calendarMonth=0; calendarYear++; } renderSidebarCalendar(activeDateStr); });
+            }
+
+            function renderEditor() {
+                const entry = editingEntryId ? entries.find(e=>e.id===editingEntryId) : null;
+                const isDeleted = entry?.deleted; const dateStr = entry?.date || (selectedDate || todayStr());
+                const title = entry?.title||'', content = entry?.content||'', mood = entry?.mood||'', tags = entry?.tags||[];
+                mainArea.innerHTML = `
+                <div class="top-bar"><h2>${editingEntryId?(isDeleted?'👁️ 已删除':'✏️ 编辑'):'✦ <span>新日记</span>'}</h2>
+                  <div class="top-actions">
+                    ${editingEntryId&&!isDeleted?`<button class="btn btn-star btn-sm" id="starToggleBtn">${entry.starred?'⭐ 已星标':'☆ 加星标'}</button><button class="btn btn-danger btn-sm" id="deleteEntryBtn">🗑 移入回收站</button>`:''}
+                    ${editingEntryId&&isDeleted?`<button class="btn btn-success btn-sm" id="restoreEntryBtn">📥 恢复</button><button class="btn btn-danger-solid btn-sm" id="permDeleteEntryBtn">💀 彻底删除</button>`:''}
+                    <button class="btn btn-ghost btn-sm" id="cancelEditBtn">取消</button></div></div>
+                ${isDeleted?`<div class="deleted-banner"><span>⚠️ 此日记已在回收站中</span></div>`:''}
+                <div class="editor-panel">
+                  <div class="editor-meta"><span class="editor-date">📅 ${formatDate(dateStr)}</span>
+                    <input type="text" class="editor-title-input" id="editorTitle" placeholder="日记标题..." value="${escapeHtml(title)}" maxlength="120" ${isDeleted?'readonly style="opacity:0.5;"':''}></div>
+                  <div class="mood-selector"><span>心情：</span>${['😄','😊','😐','😔','😢','😡','🤩','🥰','😴','💪'].map(m=>`<button class="mood-btn${mood===m?' selected':''}" data-mood="${m}" ${isDeleted?'disabled':''}>${m}</button>`).join('')}</div>
+                  ${!isDeleted?`<div class="format-toolbar">
+                    <button class="fmt-btn" data-cmd="bold"><b>B</b></button><button class="fmt-btn" data-cmd="italic"><i>I</i></button><button class="fmt-btn" data-cmd="underline"><u>U</u></button><span class="fmt-sep"></span>
+                    <button class="fmt-btn" data-cmd="h1">H1</button><button class="fmt-btn" data-cmd="h2">H2</button><button class="fmt-btn" data-cmd="h3">H3</button><span class="fmt-sep"></span>
+                    <button class="fmt-btn" data-cmd="ul">•≡</button><button class="fmt-btn" data-cmd="ol">1≡</button><button class="fmt-btn" data-cmd="quote">❝</button><button class="fmt-btn" data-cmd="code">&lt;/&gt;</button>
+                    <button class="fmt-btn" data-cmd="pre">[ ]</button><button class="fmt-btn" data-cmd="hr">—</button><button class="fmt-btn" data-cmd="link">🔗</button></div>`:''}
+                  <div class="editor-content" id="editorContent" ${isDeleted?'':'contenteditable="true"'} style="${isDeleted?'opacity:0.6;':''}">${content}</div>
+                  ${!isDeleted?`<div class="tag-input-area"><label>🏷 标签：</label><div class="tag-list" id="tagList"></div><input type="text" class="tag-add-input" id="tagAddInput" placeholder="+ 添加标签" maxlength="20"></div>`:`<div class="tag-input-area"><label>🏷 标签：</label><div class="tag-list" id="tagList"></div></div>`}
+                  <div class="editor-actions">
+                    ${!isDeleted?`<button class="btn btn-primary" id="saveEntryBtn">💾 保存</button>`:''}
+                    ${isDeleted?`<button class="btn btn-success" id="restoreSaveBtn">📥 恢复</button><button class="btn btn-danger-solid" id="permDeleteSaveBtn">💀 彻底删除</button>`:''}
+                  </div></div>`;
+                if(isDeleted){
+                    document.getElementById('editorContent').innerHTML = content||'<p style="color:var(--text3);">（已删除，无法编辑）</p>';
+                    renderTagsReadonly(tags);
+                    document.querySelectorAll('[id^="restore"]').forEach(b=>b.addEventListener('click',async()=>{ restore(editingEntryId); await persistEntries(); updateBadges(); toast('已恢复','success'); currentView='editor'; renderView(); }));
+                    document.querySelectorAll('[id^="permDelete"]').forEach(b=>b.addEventListener('click',()=>{ confirmModal('彻底删除','永久删除不可恢复','💀','确认','btn-danger-solid',async()=>{ permDel(editingEntryId); await persistEntries(); editingEntryId=null; updateBadges(); toast('已彻底删除','info'); currentView='trash'; renderView(); }); }));
+                } else {
+                    let crtTags=[...tags]; renderTags(crtTags); bindTagEvents(crtTags);
+                    document.querySelectorAll('.mood-btn').forEach(b=>b.addEventListener('click',function(){ document.querySelectorAll('.mood-btn').forEach(x=>x.classList.remove('selected')); this.classList.add('selected'); }));
+                    document.querySelectorAll('.fmt-btn').forEach(b=>b.addEventListener('click',function(){ execFormat(this.getAttribute('data-cmd')); }));
+                    document.getElementById('saveEntryBtn').addEventListener('click',saveCurrent);
+                    document.getElementById('editorContent').addEventListener('keydown',e=>{ if((e.ctrlKey||e.metaKey)&&e.key==='s'){ e.preventDefault(); saveCurrent(); } });
+                    const starBtn=document.getElementById('starToggleBtn');
+                    if(starBtn) starBtn.addEventListener('click',async()=>{ toggleStar(editingEntryId); await persistEntries(); updateBadges(); renderEditor(); });
+                    document.getElementById('deleteEntryBtn').addEventListener('click',()=>{ confirmModal('移入回收站','可在回收站恢复，30天后自动清理','🗑️','移入','btn-danger',async()=>{ softDel(editingEntryId); await persistEntries(); editingEntryId=null; updateBadges(); toast('已移入回收站','info'); currentView='list'; renderView(); }); });
+                }
+                document.getElementById('cancelEditBtn').addEventListener('click',()=>{ editingEntryId=null; selectedDate=null; currentView='list'; renderView(); });
+            }
+            function renderTags(tags){ const el=document.getElementById('tagList'); if(el) el.innerHTML=tags.map((t,i)=>`<span class="tag">${escapeHtml(t)}<span class="tag-remove" data-index="${i}">×</span></span>`).join(''); }
+            function renderTagsReadonly(tags){ const el=document.getElementById('tagList'); if(el) el.innerHTML=tags.map(t=>`<span class="tag" style="opacity:0.5">${escapeHtml(t)}</span>`).join(''); }
+            function bindTagEvents(tags){ const el=document.getElementById('tagList'), inp=document.getElementById('tagAddInput'); if(!el||!inp) return; el.querySelectorAll('.tag-remove').forEach(b=>b.addEventListener('click',function(){ const i=parseInt(this.dataset.index); tags.splice(i,1); renderTags(tags); bindTagEvents(tags); })); inp.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===','){ e.preventDefault(); const v=this.value.trim().replace(/,/g,''); if(v&&!tags.includes(v)&&tags.length<10){ tags.push(v); renderTags(tags); bindTagEvents(tags); } this.value=''; } }); }
+            function getCurrentTags(){ const el=document.getElementById('tagList'); if(!el) return[]; return [...el.querySelectorAll('.tag')].map(t=>t.textContent.replace('×','').trim()).filter(Boolean); }
+            function getCurrentMood(){ const el=document.querySelector('.mood-btn.selected'); return el?el.dataset.mood:''; }
+            async function saveCurrent(){
+                const entry = editingEntryId ? entries.find(e=>e.id===editingEntryId) : null;
+                if(entry?.deleted){ toast('已删除的日记无法编辑','warn'); return; }
+                const title=document.getElementById('editorTitle')?.value.trim()||'', content=document.getElementById('editorContent')?.innerHTML.trim()||'';
+                if(!title&&!content.replace(/<[^>]*>/g,'').trim()){ toast('请写点内容','info'); return; }
+                const mood=getCurrentMood(), tags=getCurrentTags(), dateStr=entry?.date||selectedDate||todayStr();
+                if(entry){ entry.title=title||'无标题'; entry.content=content; entry.mood=mood; entry.tags=tags; entry.updatedAt=nowISO(); }
+                else{ entries.unshift({id:'e_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),title:title||'无标题',content,date:dateStr,mood,tags,deleted:false,deletedAt:null,starred:false,createdAt:nowISO(),updatedAt:nowISO()}); }
+                sortEntries(); await persistEntries(); updateBadges(); toast('已保存并加密 ✦','success');
+                editingEntryId=null; selectedDate=null; currentView='list'; renderView();
+            }
+            function execFormat(cmd){ const ed=document.getElementById('editorContent'); if(!ed) return; ed.focus(); switch(cmd){ case'bold':document.execCommand('bold');break; case'italic':document.execCommand('italic');break; case'underline':document.execCommand('underline');break; case'h1':document.execCommand('formatBlock',false,'h1');break; case'h2':document.execCommand('formatBlock',false,'h2');break; case'h3':document.execCommand('formatBlock',false,'h3');break; case'ul':document.execCommand('insertUnorderedList');break; case'ol':document.execCommand('insertOrderedList');break; case'quote':document.execCommand('formatBlock',false,'blockquote');break; case'code':wrapSel('code');break; case'pre':wrapSel('pre');break; case'hr':document.execCommand('insertHorizontalRule');break; case'link':const url=prompt('链接：','https://'); if(url) document.execCommand('createLink',false,url);break; } ed.focus(); }
+            function wrapSel(tag){ const sel=window.getSelection(); if(!sel.rangeCount) return; const r=sel.getRangeAt(0); if(r.collapsed) return; const w=document.createElement(tag); try{r.surroundContents(w);}catch(e){ const f=r.extractContents(); w.appendChild(f); r.insertNode(w); } sel.removeAllRanges(); }
+
+            function renderList(){ const list=getActive();
+                mainArea.innerHTML=`<div class="top-bar"><h2>📖 <span>全部日记</span></h2><div class="top-actions"><button class="btn btn-primary btn-sm" id="newBtn">✚ 新日记</button></div></div><div class="entries-list" id="listContainer">${list.length===0?`<div class="no-entries"><span class="icon">📝</span><p>还没有日记 ✦</p></div>`:list.map(e=>cardHTML(e)).join('')}</div>`;
+                bindCardEvents(); document.getElementById('newBtn').addEventListener('click',()=>{ editingEntryId=null; selectedDate=null; currentView='editor'; renderView(); });
+            }
+            function renderStarred(){ const list=getStarred();
+                mainArea.innerHTML=`<div class="top-bar"><h2>⭐ <span>星标日记</span></h2></div><div class="entries-list" id="listContainer">${list.length===0?`<div class="no-entries"><span class="icon">⭐</span><p>还没有星标日记</p></div>`:list.map(e=>cardHTML(e)).join('')}</div>`;
+                bindCardEvents();
+            }
+            function renderSearch(){ const act=getActive();
+                mainArea.innerHTML=`<div class="top-bar"><h2>🔍 <span>搜索</span></h2></div><div class="search-bar"><input type="text" class="search-input" id="searchInput" placeholder="搜索标题、内容、标签..." value="${escapeHtml(searchQuery)}"><button class="btn btn-primary btn-sm" id="searchBtn">搜索</button></div><div class="entries-list" id="searchResults">${searchQuery?searchResultsHTML(searchQuery,act):'<div class="no-entries"><span class="icon">🔎</span><p>输入关键词搜索</p></div>'}</div>`;
+                document.getElementById('searchBtn').addEventListener('click',()=>{ searchQuery=document.getElementById('searchInput').value.trim(); renderSearchResultsToContainer(); });
+                document.getElementById('searchInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ searchQuery=e.target.value.trim(); renderSearchResultsToContainer(); } });
+                document.getElementById('searchInput').focus();
+            }
+            function renderTrash(){ const list=getTrash();
+                mainArea.innerHTML=`<div class="top-bar"><h2>🗑️ <span>回收站</span></h2><div class="top-actions">${list.length>0?`<button class="btn btn-danger-solid btn-sm" id="emptyBtn">💀 清空</button>`:''}</div></div>${list.length>0?`<div class="trash-info-bar"><span>📦 共 <strong>${list.length}</strong> 篇，超过${TRASH_DAYS}天自动清理</span></div>`:''}<div class="entries-list" id="trashList">${list.length===0?`<div class="no-entries"><span class="icon">🗑️</span><p>回收站为空</p></div>`:list.map(e=>cardHTML(e,true)).join('')}</div>`;
+                bindCardEvents(true);
+                document.getElementById('emptyBtn')?.addEventListener('click',()=>{ confirmModal('清空回收站','永久删除所有回收站日记，不可恢复','⚠️','清空','btn-danger-solid',async()=>{ permDelAll(); await persistEntries(); updateBadges(); toast('已清空','info'); renderTrash(); }); });
+            }
+            function cardHTML(e, isTrash=false){
+                return `<div class="entry-card${isTrash?' deleted-card':''}" data-id="${e.id}">
+                    <div class="entry-card-header"><span class="entry-card-title">${escapeHtml(e.title)}</span><span class="entry-card-date">📅 ${formatDate(e.date)}</span></div>
+                    <div class="entry-card-preview">${stripHtml(e.content).substring(0,180)}${stripHtml(e.content).length>180?'...':''}</div>
+                    <div class="entry-card-meta">${e.mood?`<span class="entry-card-mood">${e.mood}</span>`:''}<div class="entry-card-tags">${(e.tags||[]).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div></div>
+                    <div class="entry-card-actions">
+                        ${!isTrash?`<button class="star-toggle${e.starred?' starred':''}" data-id="${e.id}">${e.starred?'⭐':'☆'}</button>`:''}
+                        ${!isTrash?`<button class="btn btn-danger btn-sm card-del-btn" data-id="${e.id}">🗑</button>`:''}
+                        ${isTrash?`<button class="btn btn-success btn-sm card-restore-btn" data-id="${e.id}">📥 恢复</button><button class="btn btn-danger btn-sm card-perm-btn" data-id="${e.id}">💀</button>`:''}
+                    </div></div>`;
+            }
+            function bindCardEvents(isTrash=false){
+                document.querySelectorAll('.entry-card').forEach(card=>{
+                    card.addEventListener('click',function(e){ if(e.target.closest('button')) return; editingEntryId=this.dataset.id; currentView='editor'; renderView(); });
+                });
+                document.querySelectorAll('.star-toggle').forEach(b=>{ b.addEventListener('click',async function(e){ e.stopPropagation(); const id=this.dataset.id; toggleStar(id); await persistEntries(); updateBadges(); renderView(); }); });
+                document.querySelectorAll('.card-del-btn').forEach(b=>{ b.addEventListener('click',function(e){ e.stopPropagation(); const id=this.dataset.id; confirmModal('移入回收站','可在回收站恢复','🗑️','移入','btn-danger',async()=>{ softDel(id); await persistEntries(); updateBadges(); toast('已移入','info'); renderView(); }); }); });
+                document.querySelectorAll('.card-restore-btn').forEach(b=>{ b.addEventListener('click',async function(e){ e.stopPropagation(); restore(this.dataset.id); await persistEntries(); updateBadges(); renderTrash(); toast('已恢复','success'); }); });
+                document.querySelectorAll('.card-perm-btn').forEach(b=>{ b.addEventListener('click',function(e){ e.stopPropagation(); const id=this.dataset.id; confirmModal('彻底删除','永久删除','💀','确认','btn-danger-solid',async()=>{ permDel(id); await persistEntries(); updateBadges(); renderTrash(); }); }); });
+            }
+            function searchResultsHTML(q, src){
+                const results = src.filter(e=>e.title.toLowerCase().includes(q)||stripHtml(e.content).toLowerCase().includes(q)||(e.tags||[]).some(t=>t.toLowerCase().includes(q))||e.date.includes(q));
+                if(!results.length) return '<div class="no-entries"><span class="icon">🌌</span><p>无匹配结果</p></div>';
+                return results.map(e=>cardHTML(e)).join('');
+            }
+            function renderSearchResultsToContainer(){
+                const container = document.getElementById('searchResults'); if(!container) return;
+                container.innerHTML = searchResultsHTML(searchQuery, getActive());
+                bindCardEvents();
+            }
+            function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+            function stripHtml(h){ const d=document.createElement('div'); d.innerHTML=h; return d.textContent||''; }
+
+            async function init(){
+                await getKey(); await loadEntries(); autoClean(); updateBadges(); renderView();
+                updateMotivation(); setInterval(updateMotivation, 3600000);
+            }
+            document.addEventListener('keydown',function(e){
+                if((e.ctrlKey||e.metaKey)&&e.key==='n'){ e.preventDefault(); editingEntryId=null; selectedDate=null; currentView='editor'; renderView(); }
+                if((e.ctrlKey||e.metaKey)&&e.key==='f'){ e.preventDefault(); currentView='search'; renderView(); setTimeout(()=>document.getElementById('searchInput')?.focus(),100); }
+                if((e.ctrlKey||e.metaKey)&&e.key==='t'){ e.preventDefault(); currentView='trash'; renderView(); }
+            });
+            init();
+        })();
+    </script>
+</body>
+</html>
